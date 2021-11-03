@@ -1,0 +1,1 @@
+export default str => `https://randomuser.me/api/portraits/men/${[...str].reduce((acc, v) => (acc + v.codePointAt()) % 100, 0)}.jpg`;

@@ -1,20 +1,9 @@
 <script context="module">
     import hash_image from "$lib/hash_image";
-
-    import FriendController from "$lib/controller/FriendController";
-
-    const controller = new FriendController();
-
-    export const ssr = false;
 </script>
 
 <script>
-    export let username;
-
-    let usernames;
-
-    $: controller.listByUsername(username)
-        .then(data => usernames = data);
+    export let usernames;
 </script>
 
 <section>

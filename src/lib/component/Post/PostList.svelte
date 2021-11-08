@@ -4,7 +4,7 @@
     export let posts = [];
 </script>
 
-<article class="post-feed">
+<article class="post-list">
     {#each posts as post}
         <Post {post} on:delete/>
     {/each}

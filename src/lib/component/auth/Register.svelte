@@ -15,7 +15,7 @@
     function register() {
         controller.register(credential)
             .then(data => dispatch('sucess', data))
-            .catch();
+            .catch(data => dispatch('error', data));
     }
 </script>
 

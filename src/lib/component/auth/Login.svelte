@@ -15,7 +15,7 @@
     function login() {
         controller.login(credential)
             .then(data => dispatch('sucess', data))
-            .catch();
+            .catch(data => dispatch('error', data));
     }
 </script>
 

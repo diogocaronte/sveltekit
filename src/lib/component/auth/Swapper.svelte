@@ -4,14 +4,13 @@
 
     let is_login = true;
 
-    export let sucess = () => {};
 </script>
 
 <div class="swapper-component">
     {#if is_login}
-        <Login on:sucess={ sucess }/>
+        <Login on:sucess on:error/>
     {:else}
-        <Register on:sucess={ sucess }/>
+        <Register on:sucess on:error/>
     {/if}
     <h5 on:click={ () => is_login = !is_login }>{ is_login ? "create a new account" : "you have an account?" }</h5>
 </div>

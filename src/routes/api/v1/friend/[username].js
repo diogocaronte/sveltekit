@@ -8,7 +8,7 @@ export async function post({ locals, params }) {
     if (!user.authenticated) return Unauthorized();
 
     const finded = await db.collection('user').findOne({ username: params.username });
-    if (!finded) return NotFound();
+    if (!finded) return NotFound("User");
 
     if (finded.username == user.username) return {
         status: 406,

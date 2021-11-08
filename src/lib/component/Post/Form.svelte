@@ -16,7 +16,7 @@
     <button id="post" on:click={ () => {
         controller.create(message)
             .then(data => dispatch('sucess', data))
-            .catch();
+            .catch(data => dispatch('error', data));
         message = "";
     }}>Postar</button>
 </div>

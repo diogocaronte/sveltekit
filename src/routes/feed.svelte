@@ -1,13 +1,13 @@
 <script context="module">
     export const ssr = false;
 
-    import UserController from "$lib/controller/UserController";
     import PostController from "$lib/controller/PostController";
+    import FriendController from "$lib/controller/FriendController";
 
     import hash_image from "$lib/hash_image";
 
-    const user_controller = new UserController();
     const post_controller = new PostController();
+    const friend_controller = new FriendController();
 
     export async function load({ session, fetch }) {
         if (!session.user.authenticated) {
@@ -29,17 +29,42 @@
 </script>
 
 <script>
+    import { browser } from "$app/env";
+
     import Box from "$lib/component/Box.svelte";
     import Form from "$lib/component/Post/Form.svelte";
     import FriendGrid from "$lib/component/Friend/FriendGrid.svelte";
-    import { browser } from "$app/env";
     import PostList from "$lib/component/Post/PostList.svelte";
+    import FriendInviter from "$lib/component/Friend/FriendInviter.svelte";
+    import FriendRequestList from "$lib/component/Friend/FriendRequestList.svelte";
+    import ErrorModal from "$lib/component/ErrorModal.svelte";
 
     export let user;
 
     let posts = [];
+    let friends = [];
+    let friend_requests = [];
     if (browser) {
         post_controller.list().then(data => posts = data);
+        friend_controller.listByUsername(user.username).then(data => friends = data);
+        friend_controller.request_list(user.username).then(data => friend_requests = data);
+    }
+
+    let show_modal = false;
+    let title = "Title";
+    let message = "Message";
+
+    function error(data) {
+        show_modal = true;
+        title = "Error";
+        if (Array.isArray(data.detail.message)) {
+            message = "";
+            for (let i of data.detail.message) {
+                message += `${i.stack}; `;
+            }
+        } else {
+            message = data.detail.message;
+        }
     }
 </script>
 
@@ -52,7 +77,7 @@
         <Form on:sucess={ data => {
             posts.unshift(data.detail.post)
             posts = posts;
-        }}/>
+        }} on:error={ error }/>
         <br />
         <PostList {posts} on:delete={ data => {
             posts = posts.filter(post => post._id != data.detail)
@@ -60,11 +85,20 @@
     </Box>
 
     <div>
-        <Box><FriendGrid username={ user.username }/></Box>
+        <Box><FriendGrid usernames={ friends }/></Box>
         <br />
-        <Box>content</Box>
+        <Box><FriendInviter on:sucess={ data => {
+            console.log(data);
+        }} on:error={ error }/></Box>
+        <br />
+        <Box><FriendRequestList requests={ friend_requests }/></Box>
     </div>
 </main>
+{#if show_modal}
+    <ErrorModal { title } { message } on:close={ () => {
+        show_modal = false;
+    }}/>
+{/if}
 
 <style>
     img {
@@ -81,10 +115,25 @@
         width: 90%;
     }
 
+    :global(.post-component) {
+        margin-top: 1em;
+    }
     
     :global(.box-component) {
         flex-direction: column;
         height: max-content; /* min-content maybe */
+    }
+
+    :global(div.error-modal) {
+        position: fixed;
+        left: 1em;
+        bottom: 1em;
+
+        width: 30%;
+        height: max-content;
+        max-height: 20%;
+
+        font-size: 1.6em;
     }
 </style>
 
